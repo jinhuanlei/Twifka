@@ -24,11 +24,13 @@ public class TwitterProducer {
     String token = "1207062357995925506-14Jbj5Mh1BP7jEH5rz8JuXvk8AP7ZB";
     String secret = "NRrc6JFM69M9X0BaxUwGH17lfahfzn0KHpBYtlmUXYZJd";
     Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
+
     public static void main(String[] args) {
         new TwitterProducer().run();
     }
 
     public void run() {
+        logger.info("Setup");
         BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(100000);
         // establish the connection
         Client client = createTwitterClient(msgQueue);
@@ -42,20 +44,19 @@ public class TwitterProducer {
                 e.printStackTrace();
                 client.stop();
             }
-            if(msg != null){
+            if (msg != null) {
                 logger.info(msg);
             }
-
         }
         logger.info("End of application");
     }
 
     public Client createTwitterClient(BlockingQueue<String> msgQueue) {
-        /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
+        // Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth)
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
         // Optional: set up some followings and track terms
-        List<String> terms = Lists.newArrayList("kafka");
+        List<String> terms = Lists.newArrayList("bitcoin");
         hosebirdEndpoint.trackTerms(terms);
 
         // These secrets should be read from a config file
