@@ -27,7 +27,7 @@ public class TwitterProducer {
     String token = "1207062357995925506-14Jbj5Mh1BP7jEH5rz8JuXvk8AP7ZB";
     String secret = "NRrc6JFM69M9X0BaxUwGH17lfahfzn0KHpBYtlmUXYZJd";
     Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
-    List<String> terms = Lists.newArrayList("kafka");
+    List<String> terms = Lists.newArrayList("bitcoin", "usa", "china");
 
     public static void main(String[] args) {
         new TwitterProducer().run();
@@ -61,7 +61,7 @@ public class TwitterProducer {
                 producer.send(new ProducerRecord<>("twitter_tweets", null, msg), new Callback() {
                     @Override
                     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                        if(e != null){
+                        if (e != null) {
                             logger.error("Something bad happened", e);
                         }
                     }
@@ -71,7 +71,7 @@ public class TwitterProducer {
         logger.info("End of application");
     }
 
-    public KafkaProducer<String, String> createKafkaProducer(){
+    public KafkaProducer<String, String> createKafkaProducer() {
         final String BOOTSTRAP_SERVERS = "127.0.0.1:9092";
         // Create Producer properties
         Properties properties = new Properties();
@@ -84,6 +84,11 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
         properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); // parallel
+
+        // make it high throughput producer
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024));
         // Create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
         return producer;
